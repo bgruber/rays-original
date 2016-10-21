@@ -45,7 +45,7 @@ void setup() {
   FastLED.addLeds<WS2811, DATA_PIN>(leds, NUM_LEDS);
   leds[0] = CRGB::Black;
   FastLED.show();
-  
+
   // initialize serial:
   Serial.begin(115200);
   // reserve 200 bytes for the inputString:
@@ -67,7 +67,7 @@ void blinkLedColor(String si, String sColor) {
   int color = sColor.toInt();
 
   // leds[i] = ColorFromPalette(myPalette, color)
-  leds[i] = CHSV(color,255,255);
+  leds[i] = CHSV(color, 255, 255);
   FastLED.show();
   delay(500);
   leds[i] = CRGB::Black;
@@ -76,7 +76,7 @@ void blinkLedColor(String si, String sColor) {
 
 void blinkLed(String si) {
   int i = si.toInt();
-  
+
   // Turn the LED on, then pause
   leds[i] = CRGB::Red;
   FastLED.show();
@@ -88,12 +88,17 @@ void blinkLed(String si) {
 
 int letters[] = {33, 34, 35, 36, 37, 38, 40};
 void abcdefm() {
-  for (int i=0; i < 7; i++) {
+  // turn them all off
+  for (int i = 0; i < 7; i++) {
+    leds[letters[i]] = CRGB::Black;
+  }
+  FastLED.show();
+  for (int i = 0; i < 7; i++) {
     leds[letters[i]] = CHSV(248, 255, 255);
     FastLED.show();
     delay(200);
   }
-  for (int i=0; i < 7; i++) {
+  for (int i = 0; i < 7; i++) {
     leds[letters[i]] = CRGB::Black;
     FastLED.show();
     delay(100);
@@ -116,6 +121,36 @@ void splitSpace(String s, String tokens[]) {
   }
 }
 
+int numLettersOn = 0;
+void incLetters() {
+  numLettersOn++;
+  if (numLettersOn < 7) {
+    int i;
+    for (i = 0; i < numLettersOn; i++) {
+      leds[letters[i]] = CHSV(248, 255, 255);
+    }
+    for (; i < 7; i++) {
+      leds[letters[i]] = CRGB::Black;
+    }
+    FastLED.show();
+  }
+  else {
+    for (int blinks = 0; blinks < 3; blinks++) {
+      for (int i = 0; i < 7; i++) {
+        leds[letters[i]] = CHSV(248, 255, 255);
+      }
+      FastLED.show();
+      delay(300);
+      for (int i = 0; i < 7; i++) {
+        leds[letters[i]] = CRGB::Black;
+      }
+      FastLED.show();
+      delay(300);
+    }
+    numLettersOn = 0;
+  }
+}
+
 void loop() {
   // print the string when a newline arrives:
   if (stringComplete) {
@@ -124,7 +159,7 @@ void loop() {
     String tokens[5];
     splitSpace(inputString, tokens);
     String command = tokens[0];
-    if(command == "blink") {
+    if (command == "blink") {
       blinkLed(tokens[1]);
     }
     else if (command == "value") {
@@ -132,6 +167,9 @@ void loop() {
     }
     else if (command == "color") {
       blinkLedColor(tokens[1], tokens[2]);
+    }
+    else if (command == "letters") {
+      incLetters();
     }
     // clear the string:
     inputString = "";
