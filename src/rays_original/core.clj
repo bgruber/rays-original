@@ -326,7 +326,7 @@
   #{
     6 ;; scott
     1790684 ;; yvette
-    11202681;; real brian
+;;    11202681;; real brian
     })
 (defn rsvp-is-valuable [rsvp]
   (let [memberid (-> rsvp :member :member_id)]

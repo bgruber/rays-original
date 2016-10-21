@@ -86,9 +86,11 @@ void blinkLed(String si) {
   FastLED.show();
 }
 
+int numLettersOn = 0;
 int letters[] = {33, 34, 35, 36, 37, 38, 40};
 void abcdefm() {
   // turn them all off
+  numLettersOn = 0;
   for (int i = 0; i < 7; i++) {
     leds[letters[i]] = CRGB::Black;
   }
@@ -121,7 +123,6 @@ void splitSpace(String s, String tokens[]) {
   }
 }
 
-int numLettersOn = 0;
 void incLetters() {
   numLettersOn++;
   if (numLettersOn < 7) {
@@ -151,6 +152,11 @@ void incLetters() {
   }
 }
 
+void blinkAndLetters(String si, String sColor) {
+  incLetters();
+  blinkLedColor(si, sColor);
+}
+
 void loop() {
   // print the string when a newline arrives:
   if (stringComplete) {
@@ -166,7 +172,7 @@ void loop() {
       abcdefm();
     }
     else if (command == "color") {
-      blinkLedColor(tokens[1], tokens[2]);
+      blinkAndLetters(tokens[1], tokens[2]);
     }
     else if (command == "letters") {
       incLetters();
