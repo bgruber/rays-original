@@ -43,7 +43,9 @@ boolean stringComplete = false;  // whether the string is complete
 void setup() {
   // setup for LED
   FastLED.addLeds<WS2811, DATA_PIN>(leds, NUM_LEDS);
-
+  leds[0] = CRGB::Black;
+  FastLED.show();
+  
   // initialize serial:
   Serial.begin(115200);
   // reserve 200 bytes for the inputString:
