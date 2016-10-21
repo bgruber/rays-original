@@ -6,4 +6,5 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [clj-serial "2.0.4-SNAPSHOT"]
                  [stylefruits/gniazdo "1.0.0"]
-                 [org.clojure/data.json "0.2.6"]])
+                 [org.clojure/data.json "0.2.6"]
+                 [clj-http "3.3.0"]])

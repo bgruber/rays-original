@@ -2,7 +2,8 @@
   (:require [clojure.string :refer [join]]
             [serial.core :as serial]
             [gniazdo.core :as ws]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [clj-http.client :as http]))
 
 (defn send-command [port command & args]
   (let [command (join " " (cons command args))]
@@ -44,11 +45,40 @@
          (<= lat 40.904172)
          (>= lat 40.48926))))
 
+;; http://api.geonames.org/findNearbyPostalCodesJSON?lat=40.712692&lng=-74.015076&username=demo
+(def zips-url "http://api.geonames.org/findNearbyPostalCodesJSON")
+(def zips-username "bgruber")
+(defn fetch-zip [lat lon]
+  (let [response (http/get zips-url
+                           {:query-params {:lat lat,
+                                           :lng lon,
+                                           :username zips-username}})
+        json-str (:body response)
+        data     (json/read-str json-str :key-fn keyword)
+        results  (:postalCodes data)]
+    (:postalCode (first results))))
+
+;; TODO add api-key to avoid rate limit?
+(def cities-url "https://api.meetup.com/2/cities")
+(defn fetch-city [lat lon]
+  (let [response (http/get cities-url
+                           {:query-params {:lat lat,
+                                           :lon lon,
+                                           :page 1}})
+        json-str (:body response)
+        data     (json/read-str json-str :key-fn keyword)
+        results  (:results data)
+        city     (first results)]
+    city))
+
 (defn rsvp-handler [jsonString]
   (let [rsvp (json/read-str jsonString :key-fn keyword)]
     (if (rsvp-in-nyc rsvp)
-      (println (-> rsvp :event :event_name)
-               (-> rsvp :group :group_city)))))
+      (let [{:keys [lat lon]} (lat-lon-from-rsvp rsvp)
+            zip               (fetch-zip lat lon)]
+        (println (-> rsvp :event :event_name)
+                 (-> rsvp :group :group_city)
+                 zip)))))
 
 (comment
   (listen-rsvps! rsvp-handler)
