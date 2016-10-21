@@ -57,11 +57,33 @@ void blinkLed0() {
   FastLED.show();
 }
 
+
+void splitSpace(String s, String tokens[]) {
+  s.trim();
+  int i = 0;
+  String si = s;
+  int nextSpace = si.indexOf(" ");
+  while (nextSpace >= 0) {
+    tokens[i] = si.substring(0, nextSpace);
+    si = si.substring(nextSpace + 1);
+    i++;
+    nextSpace = si.indexOf(" ");
+  }
+  if (si.length() > 0) {
+    tokens[i] = si;
+  }
+}
+
 void loop() {
   // print the string when a newline arrives:
   if (stringComplete) {
-    Serial.println(inputString);
-    if (inputString == "blink 0\n") blinkLed0();
+    // trim newline that must be there:
+    inputString = inputString.substring(0, inputString.length() - 1);
+    String tokens[5];
+    splitSpace(inputString, tokens);
+    for(int i = 0; i < 5; i++) {
+      Serial.println(tokens[i]);
+    }
     // clear the string:
     inputString = "";
     stringComplete = false;
