@@ -79,16 +79,29 @@
         city     (first results)]
     city))
 
+(def valuable-rsvpers
+  #{
+    6 ;; scott
+    1790684 ;; yvette
+    11202681;; real brian
+    })
+(defn rsvp-is-valuable [rsvp]
+  (let [memberid (-> rsvp :member :member_id)]
+    (valuable-rsvpers memberid)))
+
 (defn rsvp-handler [jsonString]
   (let [rsvp (json/read-str jsonString :key-fn keyword)]
-    (if (rsvp-in-nyc rsvp)
+    (cond
+      (rsvp-is-valuable rsvp) (abcdefm)
+      (rsvp-in-nyc rsvp)
       (let [{:keys [lat lon]} (lat-lon-from-rsvp rsvp)
             zip               (fetch-zip lat lon)
             led               (led-for-zip zip)]
         (blink-led led)
         (println (-> rsvp :event :event_name)
                  (-> rsvp :group :group_city)
-                 led)))))
+                 led))
+      :default nil)))
 
 
 (defn shutdown []
