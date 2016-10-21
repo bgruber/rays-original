@@ -1,6 +1,11 @@
-(ns rays-original.core)
+(ns rays-original.core
+  (:require [clojure.string :refer [join]]
+            [serial.core :as serial]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn send-command [port command & args]
+  (let [command (join " " (cons command args))]
+    (serial/write port (.getBytes (str command "\n")))))
+
+(defn blink-led [port n]
+  (send-command port "blink" n))
+
