@@ -361,7 +361,7 @@
   ([port]
    (shutdown)
    (reset! serial-port (serial/open port))
-   (listen-rsvps! rsvp-handler)))
+   (listen-rsvps! #(rsvp-handler %))))
 
 
 (comment
