@@ -332,19 +332,27 @@
   (let [memberid (-> rsvp :member :member_id)]
     (valuable-rsvpers memberid)))
 
+(defn hue-for-rsvp [rsvp]
+  (let [topichash (-> rsvp :group :group_topics first :urlkey (.hashCode))]
+    (mod topichash 256)))
+
 (defn rsvp-handler [jsonString]
-  (let [rsvp (json/read-str jsonString :key-fn keyword)]
-    (cond
-      (rsvp-is-valuable rsvp) (abcdefm)
-      (rsvp-in-nyc rsvp)
-      (let [{:keys [lat lon]} (lat-lon-from-rsvp rsvp)
-            zip               (fetch-zip lat lon)
-            led               (led-for-zip zip)]
-        (blink-led led)
-        (println (-> rsvp :event :event_name)
-                 (-> rsvp :group :group_city)
-                 led))
-      :default nil)))
+  (try
+    (let [rsvp (json/read-str jsonString :key-fn keyword)]
+      (cond
+        (rsvp-is-valuable rsvp) (abcdefm)
+        (rsvp-in-nyc rsvp)
+        (let [{:keys [lat lon]} (lat-lon-from-rsvp rsvp)
+              zip               (fetch-zip lat lon)
+              led               (led-for-zip zip)
+              hue               (hue-for-rsvp rsvp)]
+          (blink-color led hue)
+          (println (-> rsvp :event :event_name)
+                   (-> rsvp :group :group_city)
+                   led
+                   hue))
+        :default nil))
+    (catch Exception e (prn (.getMessage e)))))
 
 
 (defn shutdown []
