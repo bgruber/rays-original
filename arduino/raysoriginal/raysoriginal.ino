@@ -38,9 +38,6 @@ String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 
 void setup() {
-  // required setup for builtin blink
-  pinMode(LED_BUILTIN, OUTPUT);
-
   // setup for LED
   FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
 
@@ -48,13 +45,6 @@ void setup() {
   Serial.begin(115200);
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
-}
-
-void blink() {
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
 }
 
 void blinkLed0() {
@@ -71,7 +61,6 @@ void loop() {
   // print the string when a newline arrives:
   if (stringComplete) {
     Serial.println(inputString);
-    if (inputString == "blink\n") blink();
     if (inputString == "blink 0\n") blinkLed0();
     // clear the string:
     inputString = "";
