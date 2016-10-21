@@ -14,6 +14,9 @@
   ([n] (blink-led @serial-port n))
   ([port n] (send-command port "blink" n)))
 
+(defn blink-color [n hue]
+  (send-command @serial-port "color" n hue))
+
 (defn abcdefm []
   (send-command @serial-port "value"))
 
