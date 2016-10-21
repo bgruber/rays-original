@@ -92,16 +92,21 @@
   (unlisten-rsvps!)
   (swap! serial-port #(when-not (nil? %) (serial/close! %) nil)))
 
-(defn startup []
-  (shutdown)
-  (reset! serial-port (serial/open "/dev/ttyUSB2"))
-  (listen-rsvps! rsvp-handler))
+(defn list-ports []
+  (map #(.getName %) (serial/port-identifiers)))
+(defn guess-port []
+  (first (filter #(.startsWith % "ttyUSB") (list-ports))))
+
+(defn restart
+  ([] (restart (guess-port)))
+  ([port]
+   (shutdown)
+   (reset! serial-port (serial/open port))
+   (listen-rsvps! rsvp-handler)))
 
 
 (comment
-  (listen-rsvps! rsvp-handler)
-  (unlisten-rsvps!)
+  (restart)
 
-  (startup)
   (shutdown)
-  )
+)
