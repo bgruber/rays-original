@@ -30,8 +30,11 @@
 #define DATA_PIN 31
 
 // Define the array of leds
-CRGB leds[NUM_LEDS];
+CRGBArray<NUM_LEDS> leds;
 
+
+/***** Colors *****/
+CRGBPalette16 myPalette = RainbowStripesColors_p;
 
 /***** Buffers for the serial input *****/
 String inputString = "";         // a string to hold incoming data
@@ -39,7 +42,7 @@ boolean stringComplete = false;  // whether the string is complete
 
 void setup() {
   // setup for LED
-  FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2811, DATA_PIN>(leds, NUM_LEDS);
 
   // initialize serial:
   Serial.begin(115200);
@@ -57,6 +60,17 @@ void blinkLed0() {
   FastLED.show();
 }
 
+void blinkLedColor(String si, String sColor) {
+  int i = si.toInt();
+  int color = sColor.toInt();
+
+  // leds[i] = ColorFromPalette(myPalette, color)
+  leds[i] = CHSV(color,255,255);
+  FastLED.show();
+  delay(500);
+  leds[i] = CRGB::Black;
+  FastLED.show();
+}
 
 void blinkLed(String si) {
   int i = si.toInt();
@@ -114,7 +128,9 @@ void loop() {
     else if (command == "value") {
       abcdefm();
     }
-    
+    else if (command == "color") {
+      blinkLedColor(tokens[1], tokens[2]);
+    }
     // clear the string:
     inputString = "";
     stringComplete = false;
