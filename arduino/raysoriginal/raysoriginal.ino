@@ -87,7 +87,7 @@ void blinkLed(String si) {
 int letters[] = {33, 34, 35, 36, 37, 38, 40};
 void abcdefm() {
   for (int i=0; i < 7; i++) {
-    leds[letters[i]] = CRGB::Red;
+    leds[letters[i]] = CHSV(248, 255, 255);
     FastLED.show();
     delay(200);
   }
