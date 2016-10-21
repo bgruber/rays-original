@@ -58,6 +58,18 @@ void blinkLed0() {
 }
 
 
+void blinkLed(String si) {
+  int i = si.toInt();
+  
+  // Turn the LED on, then pause
+  leds[i] = CRGB::Red;
+  FastLED.show();
+  delay(500);
+  // Now turn the LED off, then pause
+  leds[i] = CRGB::Black;
+  FastLED.show();
+}
+
 void splitSpace(String s, String tokens[]) {
   s.trim();
   int i = 0;
@@ -81,9 +93,11 @@ void loop() {
     inputString = inputString.substring(0, inputString.length() - 1);
     String tokens[5];
     splitSpace(inputString, tokens);
-    for(int i = 0; i < 5; i++) {
-      Serial.println(tokens[i]);
+    String command = tokens[0];
+    if(command == "blink") {
+      blinkLed(tokens[1]);
     }
+    
     // clear the string:
     inputString = "";
     stringComplete = false;
