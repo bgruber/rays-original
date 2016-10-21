@@ -70,6 +70,20 @@ void blinkLed(String si) {
   FastLED.show();
 }
 
+int letters[] = {33, 34, 35, 36, 37, 38, 40};
+void abcdefm() {
+  for (int i=0; i < 7; i++) {
+    leds[letters[i]] = CRGB::Red;
+    FastLED.show();
+    delay(200);
+  }
+  for (int i=0; i < 7; i++) {
+    leds[letters[i]] = CRGB::Black;
+    FastLED.show();
+    delay(100);
+  }
+}
+
 void splitSpace(String s, String tokens[]) {
   s.trim();
   int i = 0;
@@ -96,6 +110,9 @@ void loop() {
     String command = tokens[0];
     if(command == "blink") {
       blinkLed(tokens[1]);
+    }
+    else if (command == "value") {
+      abcdefm();
     }
     
     // clear the string:

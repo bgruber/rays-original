@@ -14,6 +14,9 @@
   ([n] (blink-led @serial-port n))
   ([port n] (send-command port "blink" n)))
 
+(defn abcdefm []
+  (send-command @serial-port "value"))
+
 (defn led-for-zip [zip]
   (mod (Integer/parseInt zip) 99))
 
