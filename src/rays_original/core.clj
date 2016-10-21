@@ -15,7 +15,7 @@
   ([port n] (send-command port "blink" n)))
 
 (defn led-for-zip [zip]
-  (mod (Integer/parseInt zip) 49))
+  (mod (Integer/parseInt zip) 99))
 
 (def rsvp-url "ws://stream.meetup.com/2/rsvps")
 
