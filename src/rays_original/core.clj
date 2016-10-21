@@ -9,12 +9,17 @@
   (let [command (join " " (cons command args))]
     (serial/write port (.getBytes (str command "\n")))))
 
-(defn blink-led [port n]
-  (send-command port "blink" n))
+(defonce serial-port (atom nil))
+(defn blink-led
+  ([n] (blink-led @serial-port n))
+  ([port n] (send-command port "blink" n)))
+
+(defn led-for-zip [zip]
+  (mod (Integer/parseInt zip) 49))
 
 (def rsvp-url "ws://stream.meetup.com/2/rsvps")
 
-(def socket-agent (agent nil))
+(defonce socket-agent (agent nil))
 (defn listen-rsvps! [handler]
   (send socket-agent
         (fn [socket handler]
@@ -75,14 +80,28 @@
   (let [rsvp (json/read-str jsonString :key-fn keyword)]
     (if (rsvp-in-nyc rsvp)
       (let [{:keys [lat lon]} (lat-lon-from-rsvp rsvp)
-            zip               (fetch-zip lat lon)]
+            zip               (fetch-zip lat lon)
+            led               (led-for-zip zip)]
+        (blink-led led)
         (println (-> rsvp :event :event_name)
                  (-> rsvp :group :group_city)
-                 zip)))))
+                 led)))))
+
+
+(defn shutdown []
+  (unlisten-rsvps!)
+  (swap! serial-port #(when-not (nil? %) (serial/close! %) nil)))
+
+(defn startup []
+  (shutdown)
+  (reset! serial-port (serial/open "/dev/ttyUSB2"))
+  (listen-rsvps! rsvp-handler))
+
 
 (comment
   (listen-rsvps! rsvp-handler)
-
   (unlisten-rsvps!)
 
+  (startup)
+  (shutdown)
   )
